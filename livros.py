@@ -106,7 +106,7 @@ def login():
 @app.route("/api/v1/books", methods=["GET"])
 def busca_livros():
     """
-    Gera um token JWT para autenticação.
+    Retorna todos os livros do catálogo.
     ---
     tags:
       - Usuários
@@ -128,12 +128,10 @@ def busca_livros():
       400:
         description: Usuário ou senha inválidos
     """
-    #id_livro = request.args.get('id')
-    consulta = Livros.query
-
-    #if id_livro:
-    #    consulta = consulta.filter(Livros.Id == id_livro)
+ 
+    consulta = Livros.query  
     livros = consulta.all()
+
     return jsonify(
         [
             {
@@ -152,7 +150,7 @@ def busca_livros():
 @app.route("/api/v1/books/<int:id_livro>", methods=["GET"])
 def busca_livro_id(id_livro):
     """
-    Gera um token JWT para autenticação.
+    Retorna o livro do catálogo com base no ID.
     ---
     tags:
       - Usuários
@@ -190,7 +188,7 @@ def busca_livro_id(id_livro):
 @app.route("/api/v1/books/search", methods=["GET"])
 def busca_livro_categoria():
     """
-    Gera um token JWT para autenticação.
+    Retorna os livros de acordo com o título ou categoria.
     ---
     tags:
       - Usuários
@@ -247,7 +245,7 @@ def busca_livro_categoria():
 @app.route("/api/v1/categories", methods=["GET"])
 def busca_categorias():
     """
-    Gera um token JWT para autenticação.
+    Retorna as categorias de livros disponíveis na base.
     ---
     tags:
       - Usuários
