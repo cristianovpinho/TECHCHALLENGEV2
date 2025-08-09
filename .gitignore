@@ -1,0 +1,20 @@
+# Ambiente virtual
+venv/
+.env
+
+# Arquivos de banco de dados (se não quiser versionar o SQLite)
+*.db
+instance/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Configurações locais
+config.py
+
+# Arquivos temporários
+*.log
+
+buscalivros.py
