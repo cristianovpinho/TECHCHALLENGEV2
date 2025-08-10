@@ -36,8 +36,9 @@ class Usuario(db.Model):
     Nome_usuario = db.Column(db.String(80), unique=True, nullable=False)
     Senha = db.Column(db.String(120), nullable=False)
 
+
 @app.route("/registro", methods=["POST"])
-@jwt_required()
+#@jwt_required()
 def registro_usuario():
     """
 Registro de um novo usuário.
@@ -419,6 +420,11 @@ def busca_categorias():
     return jsonify(categorias_lista)
 # ROTAS
 
+# CRIAR BANCO
+with app.app_context():
+    db.create_all()
+    print("Banco de dados criado com sucesso.")
+    
 # INICIAR APP
 if __name__ == "__main__":
   app.run()
