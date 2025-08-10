@@ -1,4 +1,5 @@
 from operator import or_
+from pydoc import text
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import (
@@ -38,7 +39,7 @@ class Usuario(db.Model):
 
 
 @app.route("/registro", methods=["POST"])
-#@jwt_required()
+@jwt_required()
 def registro_usuario():
     """
 Registro de um novo usuário.
@@ -418,6 +419,69 @@ def busca_categorias():
     categorias = db.session.query(Livros.Categoria).distinct().all()
     categorias_lista = [c[0] for c in categorias]
     return jsonify(categorias_lista)
+
+
+
+@app.route('/health', methods=['GET'])
+def check_servico():
+    """
+Verifica a saúde da aplicação.
+---
+tags:
+  - Health
+summary: Retorna o status da aplicação de API e conectividade com os dados.
+description: >
+  Endpoint que retorna uma mensagem para verificar se está tudo ok com o serviço de API (Flask) e conexão com os dados.  
+  Não requer parâmetros.
+responses:
+  200:
+    description: Tudo ok, a aplicação está funcionando e conexão com os dados ok.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            Servidor de api:
+              type: string
+              example: "API: Tudo ok por aqui;"
+            Banco de dados:
+              type: string
+              example: "Banco: Tudo ok por aqui."
+  503:
+    description: Problema, algum dos serviços não está funcionando.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            Servidor de api:
+              type: string
+              example: "API: Tudo ok por aqui;"
+            Banco de dados:
+              type: string
+              example: "Banco: Problema na conexão."
+"""
+
+    flask_status = 'API: Tudo ok por aqui;'
+    banco_status = 'Banco: Tudo ok por aqui.'
+
+    try:
+        Livros.query.get_or_404(1)
+        banco_ok = True
+    except Exception:
+        banco_ok = False
+
+    resposta_final = {
+        'Servidor de api': flask_status,
+        'Banco de dados': banco_status if banco_ok else 'Banco: Problema na conexão.'
+    }
+
+    if banco_ok:
+        return jsonify(resposta_final), 200
+    else:
+        return jsonify(resposta_final), 503
+      
+
 # ROTAS
 
 # CRIAR BANCO
