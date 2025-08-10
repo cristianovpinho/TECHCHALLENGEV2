@@ -34,8 +34,8 @@ class Livros(db.Model):
 
 class Usuario(db.Model):
     Id = db.Column(db.Integer, primary_key=True)
-    Nome_usuario = db.Column(db.String(80), unique=True, nullable=False)
-    Senha = db.Column(db.String(120), nullable=False)
+    nome_usuario = db.Column(db.String(80), unique=True, nullable=False)
+    senha = db.Column(db.String(120), nullable=False)
 
 
 @app.route("/registro", methods=["POST"])
@@ -93,10 +93,10 @@ responses:
 """
 
     data = request.get_json()
-    if Usuario.query.filter_by(Nome_usuario=data["Nome_usuario"]).first():
+    if Usuario.query.filter_by(nome_usuario=data["nome_usuario"]).first():
         return jsonify({"Erro": "Usuário já existe"}), 400
 
-    novo_usuario = Usuario(Nome_usuario=data["Nome_usuario"], Senha=data["Senha"])
+    novo_usuario = Usuario(nome_usuario=data["nome_usuario"], senha=data["senha"])
     db.session.add(novo_usuario)
     db.session.commit()
 
@@ -155,9 +155,9 @@ responses:
 """
 
     data = request.get_json()
-    user = Usuario.query.filter_by(Nome_usuario=data["Nome_usuario"]).first()
+    user = Usuario.query.filter_by(nome_usuario=data["nome_usuario"]).first()
 
-    if user and user.Senha == data["Senha"]:
+    if user and user.senha == data["senha"]:
         token = create_access_token(identity=str(user.Id))
         return jsonify({"token": token}), 201
 
@@ -483,11 +483,6 @@ responses:
 
 # ROTAS
 
-# CRIAR BANCO
-with app.app_context():
-    db.create_all()
-    print("Banco de dados criado com sucesso.")
-    
 # INICIAR APP
 if __name__ == "__main__":
   app.run()
