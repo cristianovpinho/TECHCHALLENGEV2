@@ -5,6 +5,6 @@ SWAGGER = {
     'uiversion': 3
 }
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///livros.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///base.db'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 JWT_SECRET_KEY = 'jwt-secret'

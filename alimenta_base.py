@@ -11,9 +11,31 @@ from urllib.parse import urljoin
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+# =============================================================================
+# SOLUÇÃO PARA CONECTAR AO BANCO DE DADOS NA PASTA 'instance'
+# =============================================================================
 
+# Importa a biblioteca para manipulação de caminhos do sistema operacional
+import os
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///base.db'
+# --- ANTES (cria o banco na raiz) ---
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///base.db'
+
+# --- DEPOIS (solução robusta que aponta para a pasta 'instance') ---
+
+# 1. Pega o caminho absoluto para o diretório do projeto (onde este script está)
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# 2. Constrói o caminho para a pasta 'instance'
+instance_folder = os.path.join(basedir, 'instance')
+
+# 3. Garante que a pasta 'instance' exista, criando-a se necessário.
+#    O 'exist_ok=True' evita erros se a pasta já existir.
+os.makedirs(instance_folder, exist_ok=True)
+
+# 4. Monta a URI do banco de dados apontando para o arquivo dentro da pasta 'instance'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(instance_folder, 'base.db')
+
 
 # Cria uma classe Base declarativa da qual nossos modelos de tabela herdarão.
 Base = declarative_base()
