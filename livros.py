@@ -39,7 +39,6 @@ class Usuario(db.Model):
 
 
 @app.route("/registro", methods=["POST"])
-@jwt_required()
 def registro_usuario():
     """
 Registro de um novo usuário.
