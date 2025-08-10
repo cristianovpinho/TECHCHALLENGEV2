@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# =============================================================================
-# Importação das bibliotecas necessárias
-# =============================================================================
-
 # 'requests' para fazer requisições HTTP e obter o conteúdo HTML das páginas web.
 import requests
 
@@ -17,36 +11,43 @@ from urllib.parse import urljoin
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# =============================================================================
-# Configuração do Banco de Dados com SQLAlchemy
-# =============================================================================
 
-# Define a string de conexão para o banco de dados.
-# 'sqlite:///livros.db' cria um arquivo de banco de dados SQLite chamado 'livros.db' no mesmo diretório do script.
-SQLALCHEMY_DATABASE_URI = 'sqlite:///livros.db'
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///base.db'
 
 # Cria uma classe Base declarativa da qual nossos modelos de tabela herdarão.
 Base = declarative_base()
 
 # Definição do modelo ORM para a tabela 'livros'.
-# Esta classe mapeia os objetos Python para as linhas da tabela no banco de dados.
 class Livros(Base):
     # Nome da tabela no banco de dados.
     __tablename__ = 'livros'
 
-    # Definição das colunas da tabela.
-    id = Column(Integer, primary_key=True)  # Chave primária autoincrementável.
-    Titulo = Column(String, unique=True)    # Coluna para o título, com restrição de valor único para evitar duplicatas.
-    Preco = Column(String)                  # Coluna para o preço.
-    Avaliacao = Column(String)              # Coluna para a avaliação (ex: "One", "Two", etc.).
-    Disponibilidade = Column(String)        # Coluna para o status do estoque.
-    Categoria = Column(String)              # Coluna para a categoria do livro.
-    Imagem = Column(String)                 # Coluna para a URL da imagem de capa.
+    # Definição das colunas da tabela (seguindo a convenção 'snake_case').
+    id = Column(Integer, primary_key=True)
+    titulo = Column(String, unique=True)
+    preco = Column(String)
+    avaliacao = Column(String)
+    disponibilidade = Column(String)
+    categoria = Column(String)
+    imagem = Column(String)
+
+# Definição do modelo ORM para a tabela 'usuario'.
+class Usuario(Base):
+    # CORREÇÃO: Adicionando o nome da tabela.
+    __tablename__ = 'usuario'
+
+    # MELHORIA: Padronizando o nome da coluna da chave primária para 'id'.
+    id = Column(Integer, primary_key=True)
+    # MELHORIA: Usando 'snake_case' para os nomes das colunas.
+    nome_usuario = Column(String(80), unique=True, nullable=False)
+    senha = Column(String(120), nullable=False)
+
 
 # Cria a "engine" (motor) que gerencia a conexão com o banco de dados.
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
-# Cria a tabela 'livros' no banco de dados, caso ela ainda não exista.
+# Cria TODAS as tabelas ('livros' e 'usuario') no banco de dados, caso ainda não existam.
 Base.metadata.create_all(engine)
 
 # Cria uma fábrica de sessões ('Session') que será usada para criar objetos de sessão individuais.
@@ -54,10 +55,6 @@ Session = sessionmaker(bind=engine)
 
 # Cria uma instância de sessão, que é a nossa "ponte" para interagir com o banco de dados.
 session = Session()
-
-# =============================================================================
-# Início do processo de Web Scraping
-# =============================================================================
 
 # URL da página inicial do site a ser "raspado".
 url = "https://books.toscrape.com/"
@@ -116,33 +113,23 @@ for cat in categories:
             classes = estrelas_tag.get("class", [])  # Pega a lista de classes, ex: ["star-rating", "Three"]
             avaliacao = [c for c in classes if c != "star-rating"][0] # Remove "star-rating" e pega a classe de avaliação.
 
-            # === Bloco de impressão no console (para feedback visual) ===
-            # print(f"Categoria: {categoria_nome}")
-            # print(f"Titulo: {titulo}")
-            # print(f"Imagem: {imagem}")
-            # print(f"Preco: {preco}")
-            # print(f"Estoque: {estoque}")
-            # print(f"Avaliacao: {avaliacao}")
+     
             
-            # =================================================================
-            # Persistência de Dados no Banco
-            # =================================================================
-
-            # Verifica se um livro com o mesmo título já existe no banco de dados.
+           # Verifica se um livro com o mesmo título já existe no banco de dados.
             # .first() retorna o objeto se encontrado, ou None caso contrário.
-            existe = session.query(Livros).filter_by(Titulo=titulo).first()
+            existe = session.query(Livros).filter_by(titulo=titulo).first()
             
             # Se o livro não existir no banco de dados...
             if not existe:
                 print(f"Salvando livro novo: {titulo}")
                 # Cria uma nova instância do objeto 'Livros' com os dados extraídos.
                 novo_livro = Livros(
-                    Titulo=titulo,
-                    Preco=preco,
-                    Avaliacao=avaliacao,
-                    Disponibilidade=estoque,
-                    Categoria=categoria_nome,
-                    Imagem=imagem
+                    titulo=titulo,
+                    preco=preco,
+                    avaliacao=avaliacao,
+                    disponibilidade=estoque,
+                    categoria=categoria_nome,
+                    imagem=imagem
                 )
                 # Adiciona o novo objeto à sessão.
                 session.add(novo_livro)
@@ -152,10 +139,7 @@ for cat in categories:
                 # Se o livro já existir, apenas informa no console.
                 print(f"Livro já existente no banco de dados: {titulo}")
 
-        # =================================================================
-        # Lógica de Paginação
-        # =================================================================
-        
+
         # Procura pelo link do botão "next" (próxima página).
         next_button = soup.select_one('li.next > a')
         
