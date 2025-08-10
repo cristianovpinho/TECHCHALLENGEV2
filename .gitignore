@@ -2,10 +2,6 @@
 venv/
 .env
 
-# Arquivos de banco de dados (se não quiser versionar o SQLite)
-*.db
-instance/
-
 # Cache do Python
 __pycache__/
 *.pyc
